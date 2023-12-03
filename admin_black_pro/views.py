@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from admin_black_pro.forms import RegistrationForm, LoginForm, UserPasswordResetForm, UserPasswordChangeForm, UserSetPasswordForm
 from django.contrib.auth.views import LoginView, PasswordResetView, PasswordChangeView, PasswordResetConfirmView, PasswordResetDoneView, PasswordResetCompleteView, PasswordChangeDoneView
 from django.contrib.auth import logout
+from django.contrib.auth.models import Group
 
 from django.contrib.auth.decorators import login_required
 
@@ -209,6 +210,7 @@ def rtl(request):
 class UserLoginView(LoginView):
   form_class = LoginForm
   template_name = 'accounts/login.html'
+  success_url = '/admin/job/dashboard/'  # Set the success URL to the base URL
   
   def get_context_data(self, *args, **kwargs):
     context = super(UserLoginView, self).get_context_data(*args, **kwargs)
@@ -219,7 +221,14 @@ def register(request):
   if request.method == 'POST':
     form = RegistrationForm(request.POST)
     if form.is_valid():
-      form.save()
+      user = form.save(commit=False)
+      user.is_staff = True
+      user.is_superuser = False
+      user.type = 'hiring_manager'
+      user.save()
+      group, created = Group.objects.get_or_create(name='Hiring Manager')
+      user.groups.add(group)
+      user.save()
       print("Account created successfully!")
       return redirect('/accounts/login/')
     else:

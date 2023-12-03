@@ -6,8 +6,8 @@ class User(AbstractUser):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user_id = models.CharField(max_length=30,verbose_name="ID")
     TYPE_CHOICES = (
-        ('Administrator', 'Administrator'),
-        ('Hiring Manager', 'Hiring Manager'),
+        ('administrator', 'Administrator'),
+        ('hiring_manager', 'Hiring Manager'),
     )
     type = models.CharField(max_length=50, choices=TYPE_CHOICES, default=1)
     last_name = models.CharField(max_length=30)

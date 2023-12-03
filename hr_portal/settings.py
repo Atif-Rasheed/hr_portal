@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-6%fwkezp(*0peirf4bai(3ku8_=b!3*o=9)g85i0_kdhihkw-)
 DEBUG = True
 
 ALLOWED_HOSTS = ['*']
-LOGIN_REDIRECT_URL = '/'
+LOGIN_REDIRECT_URL = '/admin/job/dashboard/'
 AUTH_USER_MODEL = 'core.User'
 
 

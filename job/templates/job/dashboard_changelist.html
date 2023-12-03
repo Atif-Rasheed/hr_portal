@@ -1,0 +1,118 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+
+
+
+{% block content %}
+
+
+
+<div class="content">
+  <div class="row">
+<div class="col-12">
+    <a href="{% url 'admin:job_job_add' %}" class="btn btn-success">
+      <img src="{% static 'admin/img/icon-addlink.svg' %}" width="16" height="16" alt="Add">
+      Add New Job
+    </a>
+  </div>
+
+
+    <div class="col-lg-4 col-md-6">
+      <div class="card card-stats">
+        <div class="card-body">
+          <div class="row">
+            <div class="col-5">
+              <div class="info-icon text-center icon-warning">
+                <i class="tim-icons icon-chat-33"></i>
+              </div>
+            </div>
+            <div class="col-7">
+              <div class="numbers">
+                <p class="card-category">Jobs</p>
+                <h3 class="card-title">{{ job_queryset.count }}</h3>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card-footer">
+          <hr>
+          <div class="stats">
+            <i class="tim-icons icon-refresh-01"></i> <a href="{% url 'admin:job_job_changelist' %}"> View Jobs</a> 
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="col-lg-4 col-md-6">
+      <div class="card card-stats">
+        <div class="card-body">
+          <div class="row">
+            <div class="col-5">
+              <div class="info-icon text-center icon-primary">
+                <i class="tim-icons icon-shape-star"></i>
+              </div>
+            </div>
+            <div class="col-7">
+              <div class="numbers">
+                <p class="card-category">Applicants</p>
+                <h3 class="card-title">{{ applicant_queryset.count }}</h3>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card-footer">
+          <hr>
+          <div class="stats">
+            <i class="tim-icons icon-sound-wave"></i> <a href="{% url 'admin:applicant_jobapplicant_changelist' %}"> View Applicants</a> 
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="col-lg-4 col-md-6">
+      <div class="card card-stats">
+        <div class="card-body">
+          <div class="row">
+            <div class="col-5">
+              <div class="info-icon text-center icon-success">
+                <i class="tim-icons icon-single-02"></i>
+              </div>
+            </div>
+            <div class="col-7">
+              <div class="numbers">
+                <p class="card-category">Updates</p>
+                <h3 class="card-title">0</h3>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card-footer">
+          <hr>
+          <div class="stats">
+            <i class="tim-icons icon-trophy"></i> Applicants Completed Testlify
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    </div>
+   
+    <!-- FLoating Action Btn -->
+    {% include 'includes/footer.html' %}
+    {% include 'applicant/floating_action_btn.html' %}
+
+  </div>
+
+{% endblock content %}
+
+{% block extra_js %}
+  <script>
+    $(document).ready(function () {
+      // Javascript method's body can be found in assets/js/demos.js
+      demo.initDashboardPageCharts();
+
+      demo.initVectorMap();
+
+    });
+  </script>
+{% endblock extra_js %}
