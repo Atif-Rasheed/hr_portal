@@ -37,6 +37,11 @@
 {% block extrahead %}
     {{ block.super }}
     {{ media.js }}
+    <head>
+        <meta charset="UTF-8" />
+        <script src="https://cdn.jsdelivr.net/npm/@checkr/web-sdk@latest"></script>
+    </head>
+    
 {% endblock %}
 
 {% if not is_popup %}
@@ -98,16 +103,13 @@
 
         <a href="{% url 'admin:sync_applicants' %}" class="btn btn-success disabled">
           <img src="{% static 'admin/img/icon-addlink.svg' %}" width="16" height="16" alt="Add">
-          Testlify
+          All Applicants
         </a>
         <a href="{% url 'admin:sync_applicants' %}" class="btn btn-warning disabled">
           <img src="{% static 'admin/img/icon-addlink.svg' %}" width="16" height="16" alt="Add">
-          Background Check
+            Ideal Candidates
         </a>
-        <a href="{% url 'admin:sync_applicants' %}" class="btn btn-danger disabled">
-          <img src="{% static 'admin/img/icon-addlink.svg' %}" width="16" height="16" alt="Add">
-          Schedule Interview
-        </a>
+       
         <a href="{% url 'admin:sync_applicants' %}" class="btn btn-success">
             <i class="tim-icons icon-refresh-02"></i>
           Sync Applicants
@@ -168,3 +170,17 @@
     {% include 'applicant/floating_action_btn.html' %}
 </div>
 {% endblock %}
+{% block extra_js %}
+<script type="text/javascript">
+    const button = document.getElementById("new-invitation-modal-button");
+
+    button.addEventListener("click", function () {
+    embed = new Checkr.Embeds.NewInvitation({
+        fakeMode: true,
+        sessionTokenPath: "/test"
+    });
+
+    embed.modal();
+    });
+</script>
+{% endblock extra_js %}

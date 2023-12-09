@@ -78,6 +78,10 @@ class Job(models.Model):
         verbose_name = 'Job'
         verbose_name_plural = 'Jobs'
         db_table = "job_jobs"
+    
+    def __str__(self):
+        if self.title:
+            return self.title
 
 
 

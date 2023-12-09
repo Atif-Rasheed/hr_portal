@@ -9,12 +9,24 @@ from django.urls import reverse
 from django.http import HttpResponseRedirect
 from job.utils.utils import sync_jobs_from_api
 from django.urls import path
+from ..models import TestlifyLink
+from ..admin import TestlifyLinkInline
 
 
 class JobAdmin(admin.ModelAdmin):
     change_list_template = 'job/job_changelist.html'
-    list_display = ['job_id','title','job_status']
+    list_display = ['job_id','title','job_status','get_testlify_links']
     exclude = ['created_on', 'updated_on','ip_address','created_by','updated_by','job_id','workflow_id','hiring_lead']
+    inlines = [TestlifyLinkInline,]
+
+
+    def get_testlify_links(self, obj):
+        # Retrieve and format information from related TestlifyLink instances
+        testlify_links = TestlifyLink.objects.filter(job_template=obj)
+        return ', '.join(link.link for link in testlify_links)
+
+    get_testlify_links.short_description = 'Testlify Links'
+
 
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         if db_field.name == "hiring_lead":
@@ -63,47 +75,10 @@ class JobAdmin(admin.ModelAdmin):
 
 
     def save_model(self, request, obj, form, change):
-        # Perform the POST request
-        payload = {}
-        payload['title'] = obj.title
-        payload['apikey'] = "MQFrqMaAJP0PH9Q93tyEDDoUWKSvY6xh"
-        payload['hiring_lead_id'] =  request.user.user_id
-        payload['employment_type'] = 1
-        payload['country'] = 1
-        payload['description'] = obj.description
-        payload['workflow_id'] = request.user.workflow_id
-        payload['job_status'] = obj.job_status
-        payload['canned_felony'] = obj.canned_felony
-        payload['canned_education'] = obj.canned_education
-        payload['minimum_experience'] = obj.minimum_experience
-        payload['approved_salary_range_minimum'] = str(obj.approved_salary_range_minimum)
-        payload['approved_salary_range_maximum'] = str(obj.approved_salary_range_maximum)
-
-        url = 'https://api.resumatorapi.com/v1/jobs'
-
-        headers = {
-            "Content-Type": "application/json"
-        }
-
-        response = requests.post(url,headers=headers,json=payload)
-        # Check if the response status code is 200
-        if response.status_code == 200:
-            json_data = response.json()
-            if 'job_id' in json_data:
-                if request.user.workflow_id:
-                    if not change:
-                        obj.created_by = request.user
-                    else:
-                        obj.updated_by = request.user
-                    obj.job_id = json_data['job_id']
-                    obj.workflow_id = request.user.workflow_id
-                    obj.save()
-            else:
-                # Now you can work with the JSON data
-                print(json_data)
+        if not change:
+            obj.created_by = request.user
         else:
-            # Handle the case when the response status code is not 200
-            print(f"Error: {response.status_code}")
-            print(response.text)  # Print the response content for debugging
+            obj.updated_by = request.user
+        obj.save()
 
 admin.site.register(Job, JobAdmin)

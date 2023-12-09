@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib import admin
-from job.models import Job
+from job.models import Job,TestlifyLink
 from applicant.models import JobApplicant
 from core.models import User
 import requests
@@ -10,15 +10,15 @@ from django import forms
 from django.urls import reverse
 from django.http import HttpResponseRedirect
 from job.utils.utils import sync_jobs_from_api
+from job.models import Job
 from applicant.utils.utils import sync_job_applicants_from_api
 from django.urls import path
 from datetime import datetime
 from django.utils.html import format_html
 
-
 class JobApplicantAdmin(admin.ModelAdmin):
     change_list_template = "applicant/applicant_changelist.html"
-    list_display = ['applicant_id','first_name','last_name','prospect_phone','apply_date','job_id','job_title','progress_bar']
+    list_display = ['first_name','last_name','apply_date','job_title','progress_bar','get_testlify_links','get_checkr_form','schedule_interview']
     exclude = ['created_on', 'updated_on','ip_address','created_by','updated_by']
    
     def job_id(self, obj):
@@ -30,6 +30,43 @@ class JobApplicantAdmin(admin.ModelAdmin):
         if obj:
             return obj.job.title
         return ""
+    
+    def get_testlify_links(self, obj):
+        # Retrieve and format information from related TestlifyLink instances
+        testlify_links = TestlifyLink.objects.filter(job_template=obj.job)
+        if testlify_links.first():
+            button_html = format_html('<a href="{}" class="btn btn-success" >'
+            '<img src="/static/admin/img/icon-addlink.svg" width="16" height="16" alt="Add">'
+            'Testlify'
+            '</a>'.format(testlify_links.first().link))
+        else:
+            button_html = format_html('<a href="---" class="btn btn-success" disabled>'
+            '<img src="/static/admin/img/icon-addlink.svg" width="16" height="16" alt="Add">'
+            'Testlify'
+            '</a>')
+        return button_html
+
+    get_testlify_links.short_description = 'Testlify Links'
+    
+    def get_checkr_form(self, obj):
+        # Retrieve and format information from related TestlifyLink instances
+        button_html = format_html('<buttpn type="button" class="btn btn-warning" id="new-invitation-modal-button">'
+          '<img src="/static/admin/img/icon-addlink.svg" width="16" height="16" alt="Add">'
+          'Background Check'
+        '</button>')
+        return button_html
+
+    get_checkr_form.short_description = 'Background Check'
+    
+    def schedule_interview(self, obj):
+        # Retrieve and format information from related TestlifyLink instances
+        button_html = format_html('<buttpn type="button" class="btn btn-danger" disabled>'
+          '<img src="/static/admin/img/icon-addlink.svg" width="16" height="16" alt="Add">'
+          'Schedule Interview'
+        '</button>')
+        return button_html
+
+    schedule_interview.short_description = 'Schedule Interview'
 
     def progress_bar(self, obj):
         progress = obj.progress  # Replace 'progress' with the actual field name in your model
@@ -95,16 +132,9 @@ class JobApplicantAdmin(admin.ModelAdmin):
 
 
     def save_model(self, request, obj, form, change):
-        # Perform the POST request
-        url = "https://api.resumatorapi.com/v1/applicants?apikey=MQFrqMaAJP0PH9Q93tyEDDoUWKSvY6xh"
-        response = requests.get(url)
-        
-        if response.status_code == 200:
-            data = response.json()
-            # Process the response data here
-            print(data)
+        if not change:
+            obj.created_by = request.user
         else:
-            print("Error:", response.status_code)
-        # super().save_model(request, obj, form, change)
-
+            obj.updated_by = request.user
+        obj.save()
 admin.site.register(JobApplicant,JobApplicantAdmin)

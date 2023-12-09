@@ -12,10 +12,9 @@
         <form method="post" class="form">
           {% csrf_token %}
 
-          <div class="card card-login card-white">
-            <div class="card-header">
-              <img src="{% static 'assets/img/card-primary.png' %}" alt="">
-              <h1 class="card-title">Log in</h1>
+          <div class="card card-login card-white mb-5">
+            <div class="card-header" style="margin-bottom: 10em;">
+              <img src="{% static 'assets/img/sunray_ops.jpeg' %}" alt="">
             </div>
             <div class="card-body">
               {% if form.non_field_errors %}

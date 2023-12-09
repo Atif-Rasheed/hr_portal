@@ -3,4 +3,4 @@ from .submodels.News import *
 from .submodels.Dashboard import *
 from .submodels.Feedback import *
 from .submodels.CriteriaKnockout import *
-from .submodels.JobTitleTemplate import *
+from .submodels.TestlifyLink import *
