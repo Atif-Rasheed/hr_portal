@@ -12,6 +12,7 @@ def sync_job_applicants_from_api():
         
         if response.status_code == 200:
             data = response.json()
+            print(data)
             # Process the response data here
             applicant_id = data['id']
             first_name = data['first_name']

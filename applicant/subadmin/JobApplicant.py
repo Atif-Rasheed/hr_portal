@@ -100,16 +100,17 @@ class JobApplicantAdmin(admin.ModelAdmin):
             job_id = data['job_id']
             job_instance = Job.objects.filter(job_id = job_id).first()
             
-            applicant, created = JobApplicant.objects.get_or_create(applicant_id=applicant_id, defaults={
-                'first_name': first_name,
-                'last_name': last_name,
-                'prospect_phone': prospect_phone,
-                'apply_date': datetime.strptime(apply_date, '%Y-%m-%d'),
-                'job' : job_instance
-            })
+            if job_instance:
+                applicant, created = JobApplicant.objects.get_or_create(applicant_id=applicant_id, defaults={
+                    'first_name': first_name,
+                    'last_name': last_name,
+                    'prospect_phone': prospect_phone,
+                    'apply_date': datetime.strptime(apply_date, '%Y-%m-%d'),
+                    'job' : job_instance
+                })
 
-        else:
-            print("Error:", response.status_code)     # Redirect to the changelist page
+            else:
+                print("Error:", response.status_code)     # Redirect to the changelist page
         change_list_url = reverse(
             'admin:%s_%s_changelist' % (
                 'applicant',
