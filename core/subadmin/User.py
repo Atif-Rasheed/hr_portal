@@ -29,12 +29,13 @@ class UserAdmin(UserAdmin):
     form = UserChangeForm
     add_form = UserCreationForm
     list_display = (
+        'user_id',
         *UserAdmin.list_display,  # Include the original list_display fields
         'workflow_id',  # Add your custom field
     )
     fieldsets = (
         *UserAdmin.fieldsets,  # Include the original fieldsets
-        ('Custom Fields', {'fields': ('workflow_id',)}),  # Add your custom field
+        ('Custom Fields', {'fields': ('workflow_id','user_id')}),  # Add your custom field
     )
   
     def save_model(self, request, obj, form, change):

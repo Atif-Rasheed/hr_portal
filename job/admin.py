@@ -1,4 +1,5 @@
 from .subadmin.TestlifyLink import *
+from .subadmin.JobTemplate import *
 from .subadmin.Job import *
 from .subadmin.News import *
 from .subadmin.Dashboard import *

@@ -2,19 +2,17 @@ from django.db import models
 from core.models import User
 import uuid
 from django.core.exceptions import ValidationError
-from ..models import JobTemplate
+from django.utils import timezone
 
-class Job(models.Model):
+class JobTemplate(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     created_on = models.DateTimeField(auto_now_add=True)
     updated_on = models.DateTimeField(auto_now=True)
-    created_by = models.ForeignKey(User, on_delete=models.CASCADE,related_name='created_%(app_label)s_%(class)s')
-    updated_by = models.ForeignKey(User, on_delete=models.CASCADE,null=True,related_name='updated_%(app_label)s_%(class)s')
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='created_by_job_templates')
+    updated_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='updated_by_job_templates',null=True)
     ip_address = models.GenericIPAddressField(null=True)
-
-    hiring_lead = models.ForeignKey(User, on_delete=models.CASCADE,null=True)
-    job_template = models.ForeignKey(JobTemplate, on_delete=models.CASCADE,null=True)
     title = models.CharField(max_length=100)
+
     description = models.TextField()
     job_id = models.CharField(max_length=150,unique=True,null=True)
     JOB_STATUS_CHOICES = (
@@ -104,7 +102,6 @@ class Job(models.Model):
     approved_salary_range_minimum = models.DecimalField(max_digits=10, decimal_places=2,verbose_name="Minimum salary",null=True,blank=True)
     approved_salary_range_maximum = models.DecimalField(max_digits=10, decimal_places=2,verbose_name="Maximum Salary",null=True,blank=True)
     department = models.CharField(max_length=300,verbose_name="Department", null=True,blank=True)
-    country = models.CharField(max_length=255,verbose_name="Country", null=True,blank=True)
     state = models.CharField(max_length=255,verbose_name="State", null=True,blank=True)
     city = models.CharField(max_length=255,verbose_name="City", null=True,blank=True)
     postal_code = models.CharField(max_length=20,verbose_name="Postal Code", null=True,blank=True)
@@ -133,16 +130,23 @@ class Job(models.Model):
     syndication = models.CharField(max_length=255, choices=SYNDICATION_CHOICES,default="No",help_text="Indicates whether the job is syndicated to Indeed, Simply Hired, and other job boards.")
     open_date = models.DateField(null=True,blank=True,verbose_name="Open Date",help_text="The Date that the Job was originally created. Use YYYY-MM-DD format")
 
+    def save(self, *args, **kwargs):
+        if not self.job_id:
+            # If the job_id is not set, generate it based on the current date and count
+            today = timezone.now().date()
+            count = JobTemplate.objects.filter(created_on__date=today).count() + 1
+            self.job_id = f"{today.strftime('%Y%m%d')}{count:03d}"
+
+        super().save(*args, **kwargs)
 
     def clean(self):
         if self.approved_salary_range_minimum >= self.approved_salary_range_maximum:
             raise ValidationError("Minimum salary must be less than maximum salary")
 
     class Meta:
-        unique_together = ('hiring_lead','job_template')
-        verbose_name = 'Job'
-        verbose_name_plural = 'Jobs'
-        db_table = "job_jobs"
+        verbose_name = 'Job Template'
+        verbose_name_plural = 'Job Templates'
+        db_table = "job_job_templates"
     
     def __str__(self):
         if self.title:

@@ -1,0 +1,76 @@
+<!-- templates/admin/yourapp/job/change_form.html -->
+{% extends 'admin/change_form.html' %}
+
+{% block extrahead %}
+    {{ block.super }}
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function(){
+            // Function to update related fields based on the selected job template
+            function updateRelatedFields() {
+                var selectedTemplateId = $("#id_job_template").val();
+                $.ajax({
+                    url: '{% url 'admin:get_template_data' %}',  // Replace with your actual URL
+                    type: 'GET',
+                    data: {'template_id': selectedTemplateId},
+                    dataType: 'json',
+                    success: function(data) {
+                        var jobRelatedData = {
+                            'title': data.title,
+                            'description': data.description,
+                            'job_id': data.job_id,
+                            'employment_type': data.employment_type,
+                            'minimum_experience': data.minimum_experience,
+                            'confidential': data.confidential,
+                            'private': data.private,
+                            'canned_address': data.canned_address,
+                            'canned_cover_letter': data.canned_cover_letter,
+                            'canned_references': data.canned_references,
+                            'canned_wmyu': data.canned_wmyu,
+                            'canned_linked_in': data.canned_linked_in,
+                            'canned_website': data.canned_website,
+                            'canned_twitter_username': data.canned_twitter_username,
+                            'canned_start': data.canned_start,
+                            'canned_weekends': data.canned_weekends,
+                            'canned_evenings': data.canned_evenings,
+                            'canned_overtime': data.canned_overtime,
+                            'canned_languages': data.canned_languages,
+                            'canned_salary': data.canned_salary,
+                            'canned_referral': data.canned_referral,
+                            'canned_license': data.canned_license,
+                            'canned_cdl': data.canned_cdl,
+                            'canned_relocate': data.canned_relocate,
+                            'canned_citizen': data.canned_citizen,
+                            'canned_education': data.canned_education,
+                            'canned_college': data.canned_college,
+                            'canned_over18': data.canned_over18,
+                            'canned_flighthours': data.canned_flighthours,
+                            'canned_flightgrade': data.canned_flightgrade,
+                            'canned_felony': data.canned_felony,
+                            'canned_felonyexplain': data.canned_felonyexplain,
+                            'approved_salary_range_minimum': data.approved_salary_range_minimum,
+                            'approved_salary_range_maximum': data.approved_salary_range_maximum,
+                            'department': data.department,
+                            'state': data.state,
+                            'city': data.city,
+                            'postal_code': data.postal_code,
+                            'internal_job_code': data.internal_job_code,
+                            'eeo_1_job_category': data.eeo_1_job_category,
+                            'syndication': data.syndication,
+                            'open_date': data.open_date
+                        };
+                        // Update the values of related fields
+                        $.each(jobRelatedData, function(field, value) {
+                            $("#id_" + field).val(value);
+                        });
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error fetching template data:', status, error);
+                    }
+                });
+            }
+            // Attach the updateRelatedFields function to the change event of the job template field
+            $("#id_job_template").change(updateRelatedFields);
+        });
+    </script>
+{% endblock %}

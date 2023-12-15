@@ -1,3 +1,4 @@
+from .submodels.JobTemplate import *
 from .submodels.Job import *
 from .submodels.News import *
 from .submodels.Dashboard import *
