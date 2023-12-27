@@ -93,14 +93,13 @@
     </div>
 
     <div class="row">
-
-      <div class="col-md-12 mb-4">
-        <a href="{% url 'admin:sync_jobs' %}" class="btn btn-warning">
-            <i class="tim-icons icon-refresh-02"></i>
-          Sync Jobs 
-        </a>
-      </div>
-
+        <div class="col-md-12 mb-4">
+            {% include 'job/messages_partial.html' %}
+            <a href="{% url 'admin:sync_jobs' %}" class="btn btn-warning">
+                <i class="tim-icons icon-refresh-02"></i>
+            Sync Jobs 
+            </a>
+        </div>
 
       <div class="{% if cl.has_filters %}col-md-10{% else %}col-md-12{% endif %}">
             {% block date_hierarchy %}

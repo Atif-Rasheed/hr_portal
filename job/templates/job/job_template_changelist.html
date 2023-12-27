@@ -37,11 +37,6 @@
 {% block extrahead %}
     {{ block.super }}
     {{ media.js }}
-    <head>
-        <meta charset="UTF-8" />
-        <script src="https://cdn.jsdelivr.net/npm/@checkr/web-sdk@latest"></script>
-    </head>
-    
 {% endblock %}
 
 {% if not is_popup %}
@@ -97,27 +92,17 @@
         </div>
     </div>
 
+
     <div class="row">
+        <div class="col-md-12 mb-4">
+            {% include 'job/messages_partial.html' %}
+            <a href="{% url 'admin:sync_job_templates' %}" class="btn btn-warning">
+                <i class="tim-icons icon-refresh-02"></i>
+            Sync Templates 
+            </a>
+        </div>
 
-      <div class="col-md-12 mb-4">
-        {% include 'job/messages_partial.html' %}
-
-        <a href="{% url 'admin:sync_applicants' %}" class="btn btn-success disabled">
-          <img src="{% static 'admin/img/icon-addlink.svg' %}" width="16" height="16" alt="Add">
-          All Applicants
-        </a>
-        <a href="{% url 'admin:sync_applicants' %}" class="btn btn-warning disabled">
-          <img src="{% static 'admin/img/icon-addlink.svg' %}" width="16" height="16" alt="Add">
-            Ideal Candidates
-        </a>
-       
-        <a href="{% url 'admin:sync_applicants' %}" class="btn btn-success">
-            <i class="tim-icons icon-refresh-02"></i>
-          Sync Applicants
-        </a>
-      </div>
-
-
+        
       <div class="{% if cl.has_filters %}col-md-10{% else %}col-md-12{% endif %}">
             {% block date_hierarchy %}
                 {% if cl.date_hierarchy %}{% date_hierarchy cl %}{% endif %}
@@ -171,80 +156,3 @@
     {% include 'applicant/floating_action_btn.html' %}
 </div>
 {% endblock %}
-{% block extra_js %}
-<script type="text/javascript">
-    const button = document.getElementById("new-invitation-modal-button");
-
-    button.addEventListener("click", function () {
-    embed = new Checkr.Embeds.NewInvitation({
-        fakeMode: true,
-        sessionTokenPath: "/test"
-    });
-
-    embed.modal();
-    });
-
-    // AJAX Method to send email
-    function sendTestlifyLinks(links,email,firstName,lastName) {
-        $.ajax({
-            type: 'POST',
-            url: '{% url "admin:send_testlify_links" %}',
-            data: {
-                'links': links,
-                'firstName': firstName,
-                'lastName': lastName,
-                'applicantEmail': email,
-            },
-            success: function(response) {
-                // Display a success message (you can customize this part)
-                alert('Testlify links sent successfully!');
-            },
-            error: function(error) {
-                // Handle errors if needed
-                console.error('Error sending Testlify links:', error);
-            }
-        });
-    }
-
-    // Send Calendly Links
-    function sendCalendlyLinks(email,firstName,lastName) {
-        $.ajax({
-            type: 'POST',
-            url: '{% url "admin:send_calendly_links" %}',
-            data: {
-                'firstName': firstName,
-                'lastName': lastName,
-                'applicantEmail': email,
-            },
-
-            success: function(data) {
-                alert('Email sent successfully');
-            },
-            error: function(error) {
-                alert('Error sending email');
-            }
-        });
-    }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-</script>
-{% endblock extra_js %}

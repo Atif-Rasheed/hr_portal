@@ -1,9 +1,9 @@
 from django.shortcuts import render, redirect
 from admin_black_pro.forms import RegistrationForm, LoginForm, UserPasswordResetForm, UserPasswordChangeForm, UserSetPasswordForm
 from django.contrib.auth.views import LoginView, PasswordResetView, PasswordChangeView, PasswordResetConfirmView, PasswordResetDoneView, PasswordResetCompleteView, PasswordChangeDoneView
-from django.contrib.auth import logout
+from django.contrib.auth import logout,get_user_model
 from django.contrib.auth.models import Group
-
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 
 
@@ -218,29 +218,39 @@ class UserLoginView(LoginView):
     return context
 
 def register(request):
-  if request.method == 'POST':
-    form = RegistrationForm(request.POST)
-    if form.is_valid():
-      user = form.save(commit=False)
-      user.is_staff = True
-      user.is_superuser = False
-      user.type = 'hiring_manager'
-      user.save()
-      group, created = Group.objects.get_or_create(name='Hiring Manager')
-      user.groups.add(group)
-      user.save()
-      print("Account created successfully!")
-      return redirect('/accounts/login/')
-    else:
-      print("Registration failed!")
-  else:
-    form = RegistrationForm()
+    if request.method == 'POST':
+        form = RegistrationForm(request.POST)
+        if form.is_valid():
+            user = form.save(commit=False)
+            # Admin User
+            User = get_user_model()
+            admin_user = User.objects.filter(email="adam@sunrayops.com").first()
 
-  context = {
-    'segment': 'register_page',
-    'form': form
-  }
-  return render(request, 'accounts/register.html', context)
+            if admin_user:
+                user.user_id = admin_user.user_id
+                user.is_staff = True
+                user.is_superuser = False
+                user.type = 'hiring_manager'
+                user.save()
+                group, created = Group.objects.get_or_create(name='Hiring Manager')
+                user.groups.add(group)
+                user.save()
+                print("Account created successfully!")
+                return redirect('/accounts/login/')
+            else:
+                # Display a message indicating that the admin user does not exist
+                messages.error(request, "Unable to register. Administrator does not exist.")
+                print("Registration failed!")
+        else:
+            print("Registration failed!")
+    else:
+        form = RegistrationForm()
+
+    context = {
+        'segment': 'register_page',
+        'form': form
+    }
+    return render(request, 'accounts/register.html', context)
 
 class UserPasswordResetView(PasswordResetView):
   template_name = 'accounts/password-reset.html'

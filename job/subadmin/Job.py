@@ -10,8 +10,7 @@ from django.http import HttpResponseRedirect
 from job.utils.utils import sync_jobs_from_api,create_new_job
 from django.urls import path
 from django.http import JsonResponse
-
-
+from django.contrib import messages
 
 class JobAdmin(admin.ModelAdmin):
     change_list_template = 'job/job_changelist.html'
@@ -44,7 +43,7 @@ class JobAdmin(admin.ModelAdmin):
     def get_urls(self):
         urls = super().get_urls()
         my_urls = [
-            path('sync_applicants/', self.sync_jobs, name='sync_jobs'),
+            path('sync_jobs/', self.sync_jobs, name='sync_jobs'),
             path('get_template_data/', self.admin_site.admin_view(self.get_template_data),name='get_template_data'),
         ]
         return my_urls + urls
@@ -53,13 +52,13 @@ class JobAdmin(admin.ModelAdmin):
     def get_queryset(self, request):
         qs = super().get_queryset(request)
         # Filter records where the hiring_manager is the current user
-        return qs.filter(hiring_lead=request.user)
+        return qs.filter(hiring_lead__user_id=request.user.user_id)
 
 
     def sync_jobs(self,request):
-        # Your API call logic here
         sync_jobs_from_api(request)
-        # Redirect to the current admin page to refresh the page
+        messages.success(request, 'Jobs synchronized successfully.')
+
         change_list_url = reverse(
             'admin:%s_%s_changelist' % (
                 'job',

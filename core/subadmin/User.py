@@ -4,7 +4,7 @@ from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.forms import UserChangeForm, UserCreationForm
 from core.models import User
 from django import forms
-
+from ..admin import CalendlyLinkInline
 
 class UserChangeForm(UserChangeForm):
     class Meta(UserChangeForm.Meta):
@@ -37,6 +37,14 @@ class UserAdmin(UserAdmin):
         *UserAdmin.fieldsets,  # Include the original fieldsets
         ('Custom Fields', {'fields': ('workflow_id','user_id')}),  # Add your custom field
     )
+    inlines = [CalendlyLinkInline,]
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        if not request.user.is_superuser:
+            return qs.filter(id=request.user.id)
+        return qs
+
   
     def save_model(self, request, obj, form, change):
         if not obj.pk:
@@ -51,6 +59,5 @@ class UserAdmin(UserAdmin):
             print(group)
             obj.groups.add(group)
             obj.save()
-            print("ELSE CALLED")
 
 admin.site.register(User, UserAdmin)

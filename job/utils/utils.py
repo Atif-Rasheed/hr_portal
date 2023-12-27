@@ -6,7 +6,6 @@ from django.utils import timezone
 from datetime import datetime
 from django.shortcuts import get_object_or_404
 
-
 def get_status_code(status):
     job_status_choices = {
         "Open (default)": "1",
@@ -66,7 +65,26 @@ def sync_jobs_from_api(request):
             internal_code = entry['internal_code']
             
             job_template = JobTemplate.objects.filter(title = title).first()
-            if job_template:
+            if job_template is None:
+                if request.user.is_superuser:
+                    job_template, created = JobTemplate.objects.get_or_create(job_id=job_id, defaults={
+                        'job_id':job_id,
+                        'title': title,
+                        'city':city,
+                        'state':state,
+                        'department':department,
+                        'description':description,
+                        'approved_salary_range_minimum': minimum_salary,
+                        'approved_salary_range_maximum': maximum_salary,
+                        'open_date':original_open_date,
+                        'employment_type': get_employment_type_code(type),
+                        'internal_job_code':internal_code,
+                        'created_by': hiring_lead,
+                        'job_status': get_status_code(status),
+                    })
+                else:
+                    return f"{title} Template do not exist"
+            else:
                 job, created = Job.objects.get_or_create(job_id=job_id, defaults={
                     'job_id':job_id,
                     'title': title,
@@ -85,6 +103,7 @@ def sync_jobs_from_api(request):
                     'created_by': hiring_lead,
                     'job_status': get_status_code(status),
                 })
+               
     else:
         print("Error:", response.status_code)
 

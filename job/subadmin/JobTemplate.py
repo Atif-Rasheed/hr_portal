@@ -12,10 +12,11 @@ from job.utils.utils import sync_jobs_from_api
 from django.urls import path
 from ..models import TestlifyLink,JobTemplate
 from ..admin import TestlifyLinkInline
+from django.contrib import messages
 
 
 class JobTemplateAdmin(admin.ModelAdmin):
-    change_list_template = 'job/job_changelist.html'
+    change_list_template = 'job/job_template_changelist.html'
     list_display = ['title','job_id','created_by','get_testlify_links']
     exclude = ['created_on', 'updated_on','ip_address','created_by','updated_by','job_id','workflow_id']
     inlines = [TestlifyLinkInline,]
@@ -38,18 +39,22 @@ class JobTemplateAdmin(admin.ModelAdmin):
     def get_urls(self):
         urls = super().get_urls()
         my_urls = [
-            path('sync_applicants/', self.sync_jobs, name='sync_jobs'),
+            path('sync_job_templates/', self.sync_jobs, name='sync_job_templates'),
         ]
         return my_urls + urls
 
     def sync_jobs(self,request):
         # Your API call logic here
-        sync_jobs_from_api()
+        message = sync_jobs_from_api(request)
+        if message:
+            messages.warning(request,message)        
+        else:
+            messages.success(request, 'Job Templates synchronized successfully.')
         # Redirect to the current admin page to refresh the page
         change_list_url = reverse(
             'admin:%s_%s_changelist' % (
                 'job',
-                'job',
+                'jobtemplate',
             ),
             current_app=self.admin_site.name,
         )

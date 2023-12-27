@@ -139,7 +139,7 @@ class Job(models.Model):
             raise ValidationError("Minimum salary must be less than maximum salary")
 
     class Meta:
-        unique_together = ('hiring_lead','job_template')
+        unique_together = ('hiring_lead','job_id')
         verbose_name = 'Job'
         verbose_name_plural = 'Jobs'
         db_table = "job_jobs"

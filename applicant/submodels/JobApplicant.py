@@ -20,9 +20,10 @@ class JobApplicant(models.Model):
     apply_date = models.DateField(auto_now_add=True)
     current_position = models.CharField(max_length=255,null=True)
     start_date = models.DateField(null=True)
-    status = models.CharField(max_length=255,null=True)
-    rating = models.CharField(max_length=255,null=True)
-    progress = models.PositiveIntegerField(default=0, null= True)
+    status = models.CharField(max_length=255,null=True,blank=True)
+    rating = models.CharField(max_length=255,null=True,blank=True)
+    email = models.EmailField(max_length=254, unique=True,null=True)
+    progress = models.PositiveIntegerField(default=0, null= True,blank=True)
 
     @property
     def progress(self):
@@ -34,6 +35,9 @@ class JobApplicant(models.Model):
     def save(self, *args, **kwargs):
         self.progress_bar = self.progress
         super().save(*args, **kwargs)
+    
+    def __str__(self):
+        return self.first_name + " " + self.last_name
 
     class Meta:
         verbose_name = 'Applicant'
