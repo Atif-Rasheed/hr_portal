@@ -26,6 +26,11 @@ class JobAdmin(admin.ModelAdmin):
         ('Canned Fields', {'fields': [('canned_address', 'canned_cover_letter','canned_references'),('canned_wmyu','canned_linked_in','canned_website'),('canned_twitter_username','canned_start','canned_weekends'),('canned_evenings','canned_overtime','canned_languages'),('canned_salary','canned_referral','canned_license'),('canned_cdl','canned_relocate','canned_citizen'),('canned_education','canned_college','canned_gpa'),('canned_over18','canned_flighthours','canned_flightgrade'),('canned_felony','canned_felonyexplain')]}),
     ]
 
+    def change_view(self, request, object_id, form_url='', extra_context=None):
+        job = Job.objects.get(pk=object_id)
+        applicants_url = reverse('admin:applicant_jobapplicant_changelist')
+        return HttpResponseRedirect(f'{applicants_url}?job__id__exact={job.id}')
+
     def get_testlify_links(self, obj):
         # Retrieve and format information from related TestlifyLink instances
         testlify_links = TestlifyLink.objects.filter(job_template=obj.job_template)

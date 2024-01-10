@@ -34,13 +34,14 @@ AUTH_USER_MODEL = 'core.User'
 
 INSTALLED_APPS = [
     'admin_black_pro.apps.AdminBlackProConfig',
-    'django.contrib.admin',
+    # 'django.contrib.admin',
+    'core.apps.CoreAdminConfig',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'core',
+    'core.apps.CoreConfig',
     'job',
     'applicant',
 ]

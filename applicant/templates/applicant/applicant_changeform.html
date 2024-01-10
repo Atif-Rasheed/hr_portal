@@ -1,0 +1,208 @@
+{% extends 'layouts/base.html' %}
+{% load static replace_value %}
+
+{% block header %}{% endblock header %}
+
+{% block content %}
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-absolute navbar-transparent">
+    <div class="container-fluid">
+      <div class="navbar-wrapper">
+        <div class="navbar-minimize d-inline">
+          <button class="minimize-sidebar btn btn-link btn-just-icon" rel="tooltip" data-original-title="Sidebar toggle" data-placement="right">
+            <i class="tim-icons icon-align-center visible-on-sidebar-regular"></i>
+            <i class="tim-icons icon-bullet-list-67 visible-on-sidebar-mini"></i>
+          </button>
+        </div>
+        <div class="navbar-toggle d-inline">
+          <button type="button" class="navbar-toggler">
+            <span class="navbar-toggler-bar bar1"></span>
+            <span class="navbar-toggler-bar bar2"></span>
+            <span class="navbar-toggler-bar bar3"></span>
+          </button>
+        </div>
+        <a class="navbar-brand" href="javascript:void(0)">{{ segment|replace_value:"_" }}</a>
+      </div>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navigation" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-bar navbar-kebab"></span>
+        <span class="navbar-toggler-bar navbar-kebab"></span>
+        <span class="navbar-toggler-bar navbar-kebab"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navigation">
+        {% include 'includes/menu-list.html' %}
+      </div>
+    </div>
+  </nav>
+  <div class="modal modal-search fade" id="searchModal" tabindex="-1" role="dialog" aria-labelledby="searchModal" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <input type="text" class="form-control" id="inlineFormInputGroup" placeholder="SEARCH">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <i class="tim-icons icon-simple-remove"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- End Navbar -->
+  <div class="content">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card card-user">
+              <div class="card-body">
+                <p class="card-text">
+                  <div class="author">
+                    <div class="block block-one"></div>
+                    <div class="block block-two"></div>
+                    <div class="block block-three"></div>
+                    <div class="block block-four"></div>
+                    <a href="javascript:void(0)">
+                      <img class="avatar" src="{% static 'assets/img/emilyz.jpg' %}" alt="...">
+                      <h5 class="title">{{ original.full_name }}</h5>
+                    </a>
+                    <p class="description">
+                        {{ original.current_position }}
+                    </p>
+                  </div>
+                </p>
+              </div>
+              {% if original.facebook %}
+              <div class="card-footer">
+                <div class="button-container">
+                  <button href="javascript:void(0)" class="btn btn-icon btn-round btn-facebook">
+                    <i class="fab fa-facebook"></i>
+                  </button>
+                  <button href="javascript:void(0)" class="btn btn-icon btn-round btn-twitter">
+                    <i class="fab fa-twitter"></i>
+                  </button>
+                  <button href="javascript:void(0)" class="btn btn-icon btn-round btn-google">
+                    <i class="fab fa-google-plus"></i>
+                  </button>
+                </div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+
+      <div class="col-md-12">
+        <div class="card">
+          <div class="card-body">
+            <form>
+              <div class="row">
+                <div class="col-md-5 pr-md-1">
+                  <div class="form-group">
+                    <span style="font-weight: bold;">Applied Job</span><br>
+                    <span>{{ original.job }} </span>
+                  </div>
+                </div>
+                <div class="col-md-3 px-md-1">
+                  <div class="form-group">
+                    <span style="font-weight: bold;">Name</span><br>
+                    <span>{{ original.full_name }} </span>
+                  </div>
+                </div>
+                <div class="col-md-4 pl-md-1">
+                  <div class="form-group">
+                    <span style="font-weight: bold;">City</span><br>
+                    <span>{{ original.city }} </span>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-5 pr-md-1">
+                  <div class="form-group">
+                    <span style="font-weight: bold;">Phone</span><br>
+                    <span>{{ original.prospect_phone }} </span>
+                  </div>
+                </div>
+                <div class="col-md-3 pl-md-1">
+                  <div class="form-group">
+                    <span style="font-weight: bold;">Apply Date</span><br>
+                    <span>{{ original.apply_date }} </span>
+                  </div>
+                </div>
+                <div class="col-md-4 pl-md-1">
+                    <div class="form-group">
+                      <span style="font-weight: bold;">Email</span><br>
+                      <span>{{ original.email }} </span>
+                    </div>
+                  </div>
+              </div>
+              <div class="row">
+                <div class="col-md-5 pr-md-1">
+                  <div class="form-group">
+                    <span style="font-weight: bold;">Rating</span><br>
+                        {% for _ in "x"|rjust:original.rating %}
+                            &#9733; 
+                        {% endfor %}
+                  </div>
+                </div>
+                <div class="col-md-3 pl-md-1">
+                  <div class="form-group">
+                    <span style="font-weight: bold;">Status</span><br>
+                    <span>{{ original.status }} </span>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    
+    </div>
+    {% include 'includes/footer.html' %}
+  </div>
+
+{% endblock content %}
+
+{% block extra_js %}
+  
+  <script>
+    $(document).ready(function() {
+
+      $(".slider").slick({
+        dots: false,
+        infinite: true,
+        centerMode: true,
+        slidesToShow: 3,
+        slidesToScroll: 1,
+        responsive: [{
+            breakpoint: 1024,
+            settings: {
+              slidesToShow: 2,
+              slidesToScroll: 1,
+              infinite: true,
+            }
+          },
+          {
+            breakpoint: 786,
+            settings: {
+              slidesToShow: 2,
+              slidesToScroll: 1,
+            }
+          },
+          {
+            breakpoint: 600,
+            settings: {
+              slidesToShow: 2,
+              slidesToScroll: 1
+            }
+          },
+          {
+            breakpoint: 480,
+            settings: {
+              slidesToShow: 1,
+              slidesToScroll: 1
+            }
+          }
+          // You can unslick at a given breakpoint now by adding:
+          // settings: "unslick"
+          // instead of a settings object
+        ]
+      });
+    });
+  </script>
+
+{% endblock extra_js %}

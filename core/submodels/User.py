@@ -16,5 +16,9 @@ class User(AbstractUser):
     date_created = models.DateTimeField(auto_now_add=True)
     workflow_id = models.CharField(max_length=50, blank=True, null=True)
 
+    @property
+    def full_name(self):
+        return f"{self.first_name} {self.last_name}"
+
     def __str__(self):
         return self.username

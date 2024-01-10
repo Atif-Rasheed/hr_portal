@@ -5,6 +5,7 @@ from django.contrib.auth import logout,get_user_model
 from django.contrib.auth.models import Group
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from utils.send_email import send_email
 
 
 def dashboard(request):
@@ -235,6 +236,9 @@ def register(request):
                 group, created = Group.objects.get_or_create(name='Hiring Manager')
                 user.groups.add(group)
                 user.save()
+
+                # Sending Email Notification To Superuser
+                send_email(subject="Hiring Manager Registration",body=f"{user.full_name} is registered as hiring manager at {user.date_joined}",recipient_email=user.email)
                 print("Account created successfully!")
                 return redirect('/accounts/login/')
             else:

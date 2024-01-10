@@ -22,7 +22,9 @@ from django.views.decorators.csrf import csrf_exempt
 
 class JobApplicantAdmin(admin.ModelAdmin):
     change_list_template = "applicant/applicant_changelist.html"
+    change_form_template = 'applicant/applicant_changeform.html'
     list_display = ['first_name','last_name','apply_date','job_title','progress_bar','get_testlify_links','get_checkr_form','schedule_interview']
+    # list_filter = ['job',]
     exclude = ['created_on', 'updated_on','ip_address','created_by','updated_by']
    
     def job_id(self, obj):

@@ -12,6 +12,9 @@ class CalendlyLink(models.Model):
     hiring_lead = models.ForeignKey(User, on_delete=models.CASCADE,null=True)
     link = models.URLField(verbose_name="Calendly Link")
 
+    def __str__(self):
+        return self.link
+
     class Meta:
         verbose_name = 'Calendly Link'
         verbose_name_plural = 'Calendly Links'

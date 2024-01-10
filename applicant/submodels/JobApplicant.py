@@ -31,6 +31,10 @@ class JobApplicant(models.Model):
         #     return 0
         # return (self.completed_tasks / self.total_tasks) * 100
         return 50
+
+    @property
+    def full_name(self):
+        return f"{self.first_name} {self.last_name}"
     
     def save(self, *args, **kwargs):
         self.progress_bar = self.progress
