@@ -3,7 +3,7 @@ from ..models import CalendlyLink
 
 class CalendlyLinkAdmin(admin.ModelAdmin):
     list_display = ['hiring_lead','link','created_on']
-    exclude = ['created_by','updated_by','ip_address']
+    exclude = ['hiring_lead','created_by','updated_by','ip_address']
 
     def get_queryset(self, request):
         queryset = super().get_queryset(request)
@@ -19,6 +19,7 @@ class CalendlyLinkAdmin(admin.ModelAdmin):
             obj.created_by = request.user
 
         obj.updated_by = request.user
+        obj.hiring_lead = request.user
         super().save_model(request, obj, form, change)
 
 admin.site.register(CalendlyLink, CalendlyLinkAdmin)

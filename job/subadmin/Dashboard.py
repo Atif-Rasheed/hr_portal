@@ -10,6 +10,19 @@ from django.shortcuts import redirect
 class DashboardAdmin(admin.ModelAdmin):
     change_list_template = "job/dashboard_changelist.html"
 
+    def has_add_permission(self, request):
+        return not request.user.is_superuser
+
+    def has_delete_permission(self, request, obj=None):
+        return not request.user.is_superuser
+
+    def has_view_permission(self, request, obj=None):
+        return not request.user.is_superuser
+
+    def has_change_permission(self, request, obj=None):
+        return not request.user.is_superuser
+
+
     def changelist_view(self, request, extra_context=None):
         job_qs = Job.objects.all()
         applicant_qs = JobApplicant.objects.all()

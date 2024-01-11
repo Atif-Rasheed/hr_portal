@@ -31,6 +31,37 @@
   {% for app in app_list %}
     {% if app.has_perms and not app.pinned %}
       {% if request.user.is_authenticated and request.user.is_superuser %}
+        <li class="">
+          <a data-toggle="collapse" href="#dashboards{{app.app_label}}" aria-expanded="false">
+            <i class="tim-icons {% if app.icon %} {{ app.icon }} {% else %} icon-lock-circle{% endif %}"></i>
+            <p>
+              {{ app.label|slice:15 }}{% if app.label|length > 15 %}..{% endif %}
+              <b class="caret"></b>
+            </p>
+          </a>
+          {% if app.models %}
+            <div 
+              class="collapse {% if 'tables-bootstrap-' in segment or app.app_label == app.label or app.url in request.path|urlencode %} show {% endif %}" 
+              id="dashboards{{app.app_label}}"
+            >
+              <ul class="nav">
+                {% for model in app.models %}
+                  {% if model.url %}
+                    <li class="{% if 'bootstrap-tables' in segment or model.url in request.path|urlencode %} active {% endif %}">
+                      <a href="{{ model.url }}">
+                        <span class="sidebar-mini-icon">{{ model.label|first }}</span>
+                        <span class="sidebar-normal">{{ model.label }}</span>
+                      </a>
+                    </li>
+                  {% else %}
+                    <li class="">{{ model.label }}</li>
+                  {% endif %}
+                {% endfor %}
+              </ul>
+            </div> 
+          {% endif %}
+        </li>
+      {% else %}
         {% for model in app.models %}
         <li class="{% if 'bootstrap-tables' in segment or model.url in request.path|urlencode %} active {% endif %}">
           <a href="{{ model.url }}">
@@ -44,7 +75,7 @@
   {% endfor %}
 {% endif %}
 
-      {% if not request.user.is_authenticated %}
+      {% if not request.user.is_authenticated and not request.user.is_superuser %}
       <li class="{% if 'pages' in parent %}active{% endif %}">
         <a data-toggle="collapse" href="#pagesExamples">
           <i class="tim-icons icon-image-02"></i>
@@ -72,7 +103,7 @@
       </li>
       {% endif %}
 
-      {% if request.user.is_authenticated and not request.user.is_superuser and not request.user.is_staff  %}
+      {% if request.user.is_authenticated  %}
       <li class="{% if 'pages' in parent %}active{% endif %}">
         <a data-toggle="collapse" href="#pagesExamples">
           <i class="tim-icons icon-image-02"></i>

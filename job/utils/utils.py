@@ -122,7 +122,7 @@ def create_new_job(request,job_instance):
         "title": job_instance.title,
         "hiring_lead_id": str(job_instance.hiring_lead.user_id),
         'title': job_instance.title,
-        'description': job_instance.description,
+        'description': job_instance.job_template.description,
         'workflow_id': request.user.workflow_id,
         'job_id': job_instance.job_id,
         'employment_type': job_instance.employment_type,
