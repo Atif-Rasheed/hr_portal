@@ -61,16 +61,16 @@ class JobTemplateAdmin(admin.ModelAdmin):
         return HttpResponseRedirect(change_list_url)
 
     def has_add_permission(self, request):
-        return not request.user.is_superuser
+        return request.user.is_superuser
 
     def has_delete_permission(self, request, obj=None):
-        return not request.user.is_superuser
+        return request.user.is_superuser
 
     def has_view_permission(self, request, obj=None):
-        return not request.user.is_superuser
+        return request.user.is_superuser
 
     def has_change_permission(self, request, obj=None):
-        return not request.user.is_superuser
+        return request.user.is_superuser
 
 
     def save_model(self, request, obj, form, change):

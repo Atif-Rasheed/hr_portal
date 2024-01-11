@@ -63,7 +63,7 @@
                       <h5 class="title">{{ original.full_name }}</h5>
                     </a>
                     <p class="description">
-                        {{ original.current_position }}
+                        {{ original.job }}
                     </p>
                   </div>
                 </p>
@@ -130,6 +130,7 @@
                     </div>
                   </div>
               </div>
+              {% if original.rating %}
               <div class="row">
                 <div class="col-md-5 pr-md-1">
                   <div class="form-group">
@@ -146,6 +147,7 @@
                   </div>
                 </div>
               </div>
+              {% endif %}
             </form>
           </div>
         </div>

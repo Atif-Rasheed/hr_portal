@@ -30,7 +30,7 @@
 {% if app_list %}
   {% for app in app_list %}
     {% if app.has_perms and not app.pinned %}
-      {% if request.user.is_authenticated and request.user.is_superuser %}
+      {% if request.user.is_authenticated and request.user.is_staff %}
         {% for model in app.models %}
         <li class="{% if 'bootstrap-tables' in segment or model.url in request.path|urlencode %} active {% endif %}">
           <a href="{{ model.url }}">

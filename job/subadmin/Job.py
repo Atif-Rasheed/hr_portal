@@ -134,7 +134,7 @@ class JobAdmin(admin.ModelAdmin):
     def has_view_permission(self, request, obj=None):
         return not request.user.is_superuser
 
-    def has_change_permission(self, request, obj=None):
+    def has_view_permission(self, request, obj=None):
         return not request.user.is_superuser
 
    
