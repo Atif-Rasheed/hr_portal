@@ -111,28 +111,29 @@ class JobApplicantAdmin(admin.ModelAdmin):
         response = requests.get(url)
         
         if response.status_code == 200:
-            data = response.json()
+            applicants_data = response.json()
             # Process the response data here
-            applicant_id = data['id']
-            first_name = data['first_name']
-            last_name = data['last_name']
-            prospect_phone = data['prospect_phone']
-            apply_date = data['apply_date']
-            job_id = data['job_id']
-            data = response.json()
-            job_instance = Job.objects.filter(job_id = job_id).first()
-           
-            if job_instance:
-                applicant, created = JobApplicant.objects.get_or_create(applicant_id=applicant_id, defaults={
-                    'first_name': first_name,
-                    'last_name': last_name,
-                    'prospect_phone': prospect_phone,
-                    'apply_date': datetime.strptime(apply_date, '%Y-%m-%d'),
-                    'job' : job_instance
-                })
-                messages.success(request, 'Applicants sync successfully.')
-            else:
-                messages.warning(request, f'job with id {job_id} not found')
+            for data in applicants_data:
+                applicant_id = data['id']
+                first_name = data['first_name']
+                last_name = data['last_name']
+                prospect_phone = data['prospect_phone']
+                apply_date = data['apply_date']
+                job_id = data['job_id']
+                data = response.json()
+                job_instance = Job.objects.filter(job_id = job_id).first()
+            
+                if job_instance:
+                    applicant, created = JobApplicant.objects.get_or_create(applicant_id=applicant_id, defaults={
+                        'first_name': first_name,
+                        'last_name': last_name,
+                        'prospect_phone': prospect_phone,
+                        'apply_date': datetime.strptime(apply_date, '%Y-%m-%d'),
+                        'job' : job_instance
+                    })
+                    messages.success(request, 'Applicants sync successfully.')
+                else:
+                    messages.warning(request, f'job with id {job_id} not found')
 
         change_list_url = reverse(
             'admin:%s_%s_changelist' % (
