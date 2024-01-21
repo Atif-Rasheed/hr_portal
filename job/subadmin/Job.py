@@ -29,7 +29,7 @@ class JobAdmin(admin.ModelAdmin):
     def change_view(self, request, object_id, form_url='', extra_context=None):
         job = Job.objects.get(pk=object_id)
         applicants_url = reverse('admin:applicant_jobapplicant_changelist')
-        return HttpResponseRedirect(f'{applicants_url}?job__id__exact={job.id}')
+        return HttpResponseRedirect(f'{applicants_url}?applicant_jobapplicantappliedjobs__job__id__exact={job.id}')
 
     def get_testlify_links(self, obj):
         # Retrieve and format information from related TestlifyLink instances
@@ -135,7 +135,12 @@ class JobAdmin(admin.ModelAdmin):
         return not request.user.is_superuser
 
     def has_view_permission(self, request, obj=None):
-        return not request.user.is_superuser
+        if request.user.is_superuser:
+            return False  # Superusers won't have view permission
+        elif request.user.is_staff:
+            return True   # Staff users will have view permission
+        else:
+            return False  # Non-staff, non-superusers won't have view permission
 
    
     def save_model(self, request, obj, form, change):

@@ -13,6 +13,4 @@ class IdealCandidate(JobApplicant):
         proxy = True
         verbose_name = verbose_name_plural = "Ideal Candidates"
 
-    def custom_method(self):
-        # Add custom methods or override existing ones
-        pass
+    

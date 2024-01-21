@@ -59,12 +59,16 @@
                     <div class="block block-three"></div>
                     <div class="block block-four"></div>
                     <a href="javascript:void(0)">
-                      <img class="avatar" src="{% static 'assets/img/emilyz.jpg' %}" alt="...">
+                      <img class="avatar" src="{% static 'assets/img/default-avatar.png' %}" alt="...">
                       <h5 class="title">{{ original.full_name }}</h5>
                     </a>
                     <p class="description">
-                        {{ original.job }}
+                        <span>Apply Date</span>
+                        <strong>{{ original.apply_date }}</strong>
                     </p>
+                    <p class="description">
+                      <strong><em>{{ applied_job.job }}</em></strong>
+                  </p>
                   </div>
                 </p>
               </div>
@@ -152,6 +156,357 @@
           </div>
         </div>
       </div>
+
+      <div class="col-md-12">
+        <div class="card">
+          <div class="card-body">
+            <form>
+              <div class="row">
+                <div class="col-md-6 pr-md-1">
+                  <div class="form-group">
+                    <span style="font-weight: bold;">Address</span><br>
+                    <span>{{ original.address }} </span>
+                  </div>
+                </div>
+                <div class="col-md-6 px-md-1">
+                  <div class="form-group">
+                    <span style="font-weight: bold;">Location</span><br>
+                    <span>{{ original.location }} </span>
+                  </div>
+                </div>
+              </div>
+        
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-12">
+        <div class="card">
+          <div class="card-body">
+            <form>
+              <div class="row">
+                <div class="col-md-4 pr-md-1">
+                  <div class="form-group">
+                    <span style="font-weight: bold;">EEO Gender</span><br>
+                    <span>{{ original.eeo_gender }} </span>
+                  </div>
+                </div>
+                <div class="col-md-4 px-md-1">
+                  <div class="form-group">
+                    <span style="font-weight: bold;">EEO Race</span><br>
+                    <span>{{ original.eeo_race }} </span>
+                  </div>
+                </div>
+
+                <div class="col-md-4 px-md-1">
+                  <div class="form-group">
+                    <span style="font-weight: bold;">EEO Disability</span><br>
+                    <span>{{ original.eeo_disability }} </span>
+                  </div>
+                </div>
+
+              </div>
+        
+              <div class="row">
+                <div class="col-md-4 pr-md-1">
+                  <div class="form-group">
+                    <span style="font-weight: bold;">Website</span><br>
+                    <span>{{ original.website }} </span>
+                  </div>
+                </div>
+                <div class="col-md-4 px-md-1">
+                  <div class="form-group">
+                    <span style="font-weight: bold;">Desired Salary</span><br>
+                    <span>{{ original.desired_salary }} </span>
+                  </div>
+                </div>
+
+                <div class="col-md-4 px-md-1">
+                  <div class="form-group">
+                    <span style="font-weight: bold;">Desired Start Date</span><br>
+                    <span>{{ original.desired_start_date }} </span>
+                  </div>
+                </div>
+
+              </div>
+        
+            </form>
+          </div>
+        </div>
+      </div>
+
+     
+      <div class="col-md-12">
+        <div class="card">
+          <div class="card-body">
+            <form>
+              <div class="row">
+                <div class="col-md-4 pr-md-1">
+                  <div class="form-group">
+                    <span style="font-weight: bold;">Referrer</span><br>
+                    <span>{{ original.referrer }} </span>
+                  </div>
+                </div>
+                <div class="col-md-4 px-md-1">
+                  <div class="form-group">
+                    <span style="font-weight: bold;">Languages</span><br>
+                    <span>{{ original.languages }} </span>
+                  </div>
+                </div>
+
+                <div class="col-md-4 px-md-1">
+                  <div class="form-group">
+                    <span style="font-weight: bold;">WMYU</span><br>
+                    <span>{{ original.wmyu }} </span>
+                  </div>
+                </div>
+
+              </div>
+        
+              <div class="row">
+                <div class="col-md-4 pr-md-1">
+                  <div class="form-group">
+                    <span style="font-weight: bold;">Has Driver License</span><br>
+                    <span>{{ original.has_driver_license }} </span>
+                  </div>
+                </div>
+                <div class="col-md-4 px-md-1">
+                  <div class="form-group">
+                    <span style="font-weight: bold;">Willing To Relocate</span><br>
+                    <span>{{ original.willing_to_relocate }} </span>
+                  </div>
+                </div>
+
+                <div class="col-md-4 px-md-1">
+                  <div class="form-group">
+                    <span style="font-weight: bold;">Citizenship Status</span><br>
+                    <span>{{ original.citizenship_status }} </span>
+                  </div>
+                </div>
+
+              </div>
+
+              <div class="row">
+                <div class="col-md-4 pr-md-1">
+                  <div class="form-group">
+                    <span style="font-weight: bold;">Has Driver License</span><br>
+                    <span>{{ original.has_driver_license }} </span>
+                  </div>
+                </div>
+                <div class="col-md-4 px-md-1">
+                  <div class="form-group">
+                    <span style="font-weight: bold;">Willing To Relocate</span><br>
+                    <span>{{ original.willing_to_relocate }} </span>
+                  </div>
+                </div>
+
+                <div class="col-md-4 px-md-1">
+                  <div class="form-group">
+                    <span style="font-weight: bold;">Citizenship Status</span><br>
+                    <span>{{ original.citizenship_status }} </span>
+                  </div>
+                </div>
+
+              </div>
+        
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-12">
+        <div class="card">
+          <div class="card-body">
+            <form>
+              <div class="row">
+                <div class="col-md-4 pr-md-1">
+                  <div class="form-group">
+                    <span style="font-weight: bold;">Education Level</span><br>
+                    <span>{{ original.education_level }} </span>
+                  </div>
+                </div>
+                <div class="col-md-4 px-md-1">
+                  <div class="form-group">
+                    <span style="font-weight: bold;">Has CDL</span><br>
+                    <span>{{ original.has_cdl }} </span>
+                  </div>
+                </div>
+
+                <div class="col-md-4 px-md-1">
+                  <div class="form-group">
+                    <span style="font-weight: bold;">Over 18</span><br>
+                    <span>{{ original.over_18 }} </span>
+                  </div>
+                </div>
+
+              </div>
+        
+              <div class="row">
+                <div class="col-md-4 pr-md-1">
+                  <div class="form-group">
+                    <span style="font-weight: bold;">Can Work Weekends</span><br>
+                    <span>{{ original.can_work_weekends }} </span>
+                  </div>
+                </div>
+                <div class="col-md-4 px-md-1">
+                  <div class="form-group">
+                    <span style="font-weight: bold;">Can Work Evenings</span><br>
+                    <span>{{ original.can_work_evenings }} </span>
+                  </div>
+                </div>
+
+                <div class="col-md-4 px-md-1">
+                  <div class="form-group">
+                    <span style="font-weight: bold;">Can Work Overtime</span><br>
+                    <span>{{ original.can_work_overtime }} </span>
+                  </div>
+                </div>
+
+              </div>
+
+           
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-12">
+        <div class="card">
+          <div class="card-body">
+            <form>
+              <div class="row">
+                <div class="col-md-4 pr-md-1">
+                  <div class="form-group">
+                    <span style="font-weight: bold;">Has Felony</span><br>
+                    <span>{{ original.has_felony }} </span>
+                  </div>
+                </div>
+                <div class="col-md-8 px-md-1">
+                  <div class="form-group">
+                    <span style="font-weight: bold;">Felony Explanation</span><br>
+                    <span>{{ original.felony_explanation }} </span>
+                  </div>
+                </div>
+              </div>
+        
+              <div class="row">
+                <div class="col-md-4 pr-md-1">
+                  <div class="form-group">
+                    <span style="font-weight: bold;">Twitter Username</span><br>
+                    <span>{{ original.twitter_username }} </span>
+                  </div>
+                </div>
+                <div class="col-md-4 px-md-1">
+                  <div class="form-group">
+                    <span style="font-weight: bold;">College GPA</span><br>
+                    <span>{{ original.college_gpa }} </span>
+                  </div>
+                </div>
+
+                <div class="col-md-4 px-md-1">
+                  <div class="form-group">
+                    <span style="font-weight: bold;">College</span><br>
+                    <span>{{ original.college }} </span>
+                  </div>
+                </div>
+
+              </div>
+
+           
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-12">
+        <div class="card">
+          <div class="card-body">
+            <form>
+              <div class="row">
+                <div class="col-md-4 pr-md-1">
+                  <div class="form-group">
+                    <span style="font-weight: bold;">LinkedIn Url</span><br>
+                    <span>{{ original.linkedin_url }} </span>
+                  </div>
+                </div>
+
+                <div class="col-md-8 pr-md-1">
+                  <div class="form-group">
+                    <span style="font-weight: bold;">Notes</span><br>
+                    <span>{{ original.notes }} </span>
+                  </div>
+                </div>
+              </div>
+        
+              <div class="row">
+                <div class="col-md-4 pr-md-1">
+                  <div class="form-group">
+                    <span style="font-weight: bold;">Comments Count</span><br>
+                    <span>{{ original.comments_count }} </span>
+                  </div>
+                </div>
+                <div class="col-md-4 px-md-1">
+                  <div class="form-group">
+                    <span style="font-weight: bold;">Source</span><br>
+                    <span>{{ original.source }} </span>
+                  </div>
+                </div>
+
+                <div class="col-md-4 px-md-1">
+                  <div class="form-group">
+                    <span style="font-weight: bold;">Can Work Overtime</span><br>
+                    <span>{{ original.can_work_overtime }} </span>
+                  </div>
+                </div>
+
+              </div>
+
+           
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-12">
+        <div class="card">
+          <div class="card-body">
+            <form>
+              <div class="row">
+                <div class="col-md-3 pr-md-1">
+                  <div class="form-group">
+                    <span style="font-weight: bold;">EEOC Veteran</span><br>
+                    <span>{{ original.eeoc_veteran }} </span>
+                  </div>
+                </div>
+                <div class="col-md-3 px-md-1">
+                  <div class="form-group">
+                    <span style="font-weight: bold;">EEOC Disability</span><br>
+                    <span>{{ original.eeo_race }} </span>
+                  </div>
+                </div>
+
+                <div class="col-md-3 px-md-1">
+                  <div class="form-group">
+                    <span style="font-weight: bold;">EEOC Disability Signature</span><br>
+                    <span>{{ original.eeo_disability }} </span>
+                  </div>
+                </div>
+
+
+                <div class="col-md-3 px-md-1">
+                  <div class="form-group">
+                    <span style="font-weight: bold;">EEOC Disability Date</span><br>
+                    <span>{{ original.eeo_disability }} </span>
+                  </div>
+                </div>
+
+              </div>
+          </form>
+          </div>
+        </div>
+      </div>
+
     
     </div>
     {% include 'includes/footer.html' %}

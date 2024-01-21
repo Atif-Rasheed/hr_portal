@@ -5,6 +5,7 @@ import requests
 from django.utils import timezone
 from datetime import datetime
 from django.shortcuts import get_object_or_404
+from hr_portal.settings import API_KEY
 
 def get_status_code(status):
     job_status_choices = {
@@ -41,7 +42,7 @@ def get_employment_type_code(employment_type):
 
 
 def sync_jobs_from_api(request):
-    url = "https://api.resumatorapi.com/v1/jobs?apikey=MQFrqMaAJP0PH9Q93tyEDDoUWKSvY6xh"
+    url = f"https://api.resumatorapi.com/v1/jobs?apikey={API_KEY}"
     response = requests.get(url)
     
     if response.status_code == 200:
@@ -84,7 +85,8 @@ def sync_jobs_from_api(request):
                     })
                 else:
                     return f"{title} Template do not exist"
-            else:
+
+            if job_template:
                 job, created = Job.objects.get_or_create(job_id=job_id, defaults={
                     'job_id':job_id,
                     'title': title,
@@ -103,6 +105,7 @@ def sync_jobs_from_api(request):
                     'created_by': hiring_lead,
                     'job_status': get_status_code(status),
                 })
+                print(job,created)
                
     else:
         print("Error:", response.status_code)

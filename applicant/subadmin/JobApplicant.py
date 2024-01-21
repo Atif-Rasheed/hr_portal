@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib import admin
 from job.models import Job,TestlifyLink
-from applicant.models import JobApplicant
+from applicant.models import JobApplicant,JobApplicantComment,JobApplicantFeedback,JobApplicantActivity,JobApplicantMessage,JobApplicantAppliedJob
 from core.models import User,CalendlyLink
 import requests
 from django.core.serializers.json import DjangoJSONEncoder
@@ -18,41 +18,63 @@ from job.utils.utils import sync_jobs_from_api
 from job.models import Job
 from applicant.utils.utils import sync_job_applicants_from_api
 from django.views.decorators.csrf import csrf_exempt
+from datetime import datetime
+from django.conf import settings
+from decimal import Decimal
+from applicant.utils.JobApplicantManager import JobApplicantManager,JobApplicantAppliedJob
 
 
 class JobApplicantAdmin(admin.ModelAdmin):
     change_list_template = "applicant/applicant_changelist.html"
     change_form_template = 'applicant/applicant_changeform.html'
-    list_display = ['first_name','last_name','apply_date','job_title','progress_bar','get_testlify_links','get_checkr_form','schedule_interview']
-    # list_filter = ['job',]
+    list_display = ['first_name','last_name','email','apply_date','progress_bar','job_id','get_testlify_links','get_checkr_form','schedule_interview']
+    list_per_page = 20
+    list_filter = ['applicant_jobapplicantappliedjobs__job',]
     exclude = ['created_on', 'updated_on','ip_address','created_by','updated_by']
+
+    def change_view(self, request, object_id, form_url='', extra_context=None):
+        obj = self.get_object(request, object_id)
+        if extra_context is None:
+            extra_context = {}
+        extra_context['applied_job'] = JobApplicantAppliedJob.objects.filter(applicant_id=obj.id).first()
+        return super().change_view(request, object_id, form_url, extra_context)
+
    
     def job_id(self, obj):
         if obj:
-            return obj.job.job_id
+            applied_job = JobApplicantAppliedJob.objects.filter(applicant = obj).first()
+            if applied_job:
+                return applied_job.job.job_id
+            else:
+                return ""
         return ""
    
-    def job_title(self, obj):
-        if obj:
-            return obj.job.title
-        return ""
-    
     def get_testlify_links(self, obj):
         # Retrieve and format information from related TestlifyLink instances
-        testlify_links = TestlifyLink.objects.filter(job_template=obj.job.job_template)
-        if testlify_links.exists() and obj.email:
-            links = [link.link for link in testlify_links]
-            first_name = obj.first_name 
-            last_name = obj.last_name 
-            email = obj.email 
+        applied_job = JobApplicantAppliedJob.objects.filter(applicant = obj).first()
+        if applied_job:
+            testlify_links = TestlifyLink.objects.filter(job_template=applied_job.job.job_template)
+            if testlify_links.exists() and obj.email:
+                links = [link.link for link in testlify_links]
+                first_name = obj.first_name 
+                last_name = obj.last_name 
+                email = obj.email 
 
-            link = testlify_links.first().link
-            button_html = format_html(
-                '<button type="buttton" class="btn btn-success" onclick="sendTestlifyLinks({}, \'{}\', \'{}\',\'{}\')">'
-                '<img src="/static/admin/img/icon-addlink.svg" width="16" height="16" alt="Add">'
-                'Send Testlify'
-                '</button>'.format(links,email,first_name,last_name)
-            )
+                link = testlify_links.first().link
+                button_html = format_html(
+                    '<button type="buttton" class="btn btn-success" onclick="sendTestlifyLinks({}, \'{}\', \'{}\',\'{}\')">'
+                    '<img src="/static/admin/img/icon-addlink.svg" width="16" height="16" alt="Add">'
+                    'Send Testlify'
+                    '</button>'.format(links,email,first_name,last_name)
+                )
+            else:
+                button_html = format_html(
+                    '<button class="btn btn-success" disabled>'
+                    '<img src="/static/admin/img/icon-addlink.svg" width="16" height="16" alt="Add">'
+                    'Send Testlify'
+                    '</button>'
+                )
+
         else:
             button_html = format_html(
                 '<button class="btn btn-success" disabled>'
@@ -88,12 +110,11 @@ class JobApplicantAdmin(admin.ModelAdmin):
     schedule_interview.short_description = 'Schedule Interview'
 
     def progress_bar(self, obj):
-        progress = obj.progress  # Replace 'progress' with the actual field name in your model
-        return format_html(
-            '<progress value="{}" max="100"></progress>'
-            '<span> {}%</span>',
-          progress, progress
-        )
+        applied_job = JobApplicantAppliedJob.objects.filter(applicant = obj).first()
+        if applied_job:
+            return applied_job.applicant_progress
+        else:
+            return "No Progress Found"
     progress_bar.short_description = 'Progress'
 
     def get_urls(self):
@@ -106,8 +127,9 @@ class JobApplicantAdmin(admin.ModelAdmin):
         return my_urls + urls
 
     def sync_applicants(self,request):
+        API_KEY = getattr(settings, 'API_KEY')
         # Your API call logic here
-        url = "https://api.resumatorapi.com/v1/applicants?apikey=MQFrqMaAJP0PH9Q93tyEDDoUWKSvY6xh"
+        url = f"https://api.resumatorapi.com/v1/applicants?apikey={API_KEY}"
         response = requests.get(url)
         
         if response.status_code == 200:
@@ -115,25 +137,130 @@ class JobApplicantAdmin(admin.ModelAdmin):
             # Process the response data here
             for data in applicants_data:
                 applicant_id = data['id']
-                first_name = data['first_name']
-                last_name = data['last_name']
-                prospect_phone = data['prospect_phone']
-                apply_date = data['apply_date']
-                job_id = data['job_id']
-                data = response.json()
-                job_instance = Job.objects.filter(job_id = job_id).first()
-            
-                if job_instance:
-                    applicant, created = JobApplicant.objects.get_or_create(applicant_id=applicant_id, defaults={
-                        'first_name': first_name,
-                        'last_name': last_name,
-                        'prospect_phone': prospect_phone,
-                        'apply_date': datetime.strptime(apply_date, '%Y-%m-%d'),
-                        'job' : job_instance
-                    })
-                    messages.success(request, 'Applicants sync successfully.')
-                else:
-                    messages.warning(request, f'job with id {job_id} not found')
+                if applicant_id:
+                    url = f"https://api.resumatorapi.com/v1/applicants/{applicant_id}?apikey={API_KEY}"
+                    response = requests.get(url)
+                    if response.status_code == 200:
+                        applicant_detail_data = response.json()
+                        applicant = JobApplicant.objects.filter(applicant_id = applicant_id).first()
+                        if applicant is None:
+                            applicant = JobApplicant()
+                        applicant.applicant_id = applicant_id
+                        applicant.first_name = applicant_detail_data['first_name']
+                        applicant.last_name = applicant_detail_data['last_name']
+                        applicant.email = applicant_detail_data['email']
+                        applicant.address = applicant_detail_data['address']
+                        applicant.location = applicant_detail_data['location']
+                        applicant.prospect_phone = applicant_detail_data['phone']
+                        applicant.linkedin_url = applicant_detail_data['linkedin_url']
+                        applicant.eeo_gender = applicant_detail_data['eeo_gender']
+                        applicant.eeo_race = applicant_detail_data['eeo_race']
+                        applicant.eeo_disability = applicant_detail_data['eeo_disability']
+                        applicant.website = applicant_detail_data['website']
+                        if applicant_detail_data['desired_salary']:
+                            applicant.college_gpa = Decimal(applicant_detail_data['desired_salary'])
+                        if applicant_detail_data['desired_start_date']:
+                            desired_start_date = datetime.strptime(applicant_detail_data['desired_start_date'], "%Y-%m-%d").date()
+                            applicant.desired_start_date = desired_start_date
+                        applicant.languages = applicant_detail_data['languages']
+                        applicant.wmyu = applicant_detail_data['wmyu']
+                        applicant.has_driver_license = applicant_detail_data['has_driver_license']
+                        applicant.willing_to_relocate = applicant_detail_data['willing_to_relocate']
+                        applicant.citizenship_status = applicant_detail_data['citizenship_status']
+                        applicant.education_level = applicant_detail_data['education_level']
+                        applicant.has_cdl = applicant_detail_data['has_cdl']
+                        applicant.over_18 = applicant_detail_data['over_18']
+                        applicant.can_work_weekends = applicant_detail_data['can_work_weekends']
+                        applicant.can_work_evenings = applicant_detail_data['can_work_evenings']
+                        applicant.can_work_overtime = applicant_detail_data['can_work_overtime']
+                        applicant.has_felony = applicant_detail_data['has_felony']
+                        applicant.felony_explanation = applicant_detail_data['felony_explanation']
+                        applicant.twitter_username = applicant_detail_data['twitter_username']
+                        if applicant_detail_data['college_gpa']:
+                            applicant.college_gpa = Decimal(applicant_detail_data['college_gpa'])
+                        applicant.college = applicant_detail_data['college']
+                        applicant.references = applicant_detail_data['references']
+                        applicant.notes = applicant_detail_data['notes']
+                        if applicant_detail_data['apply_date']:
+                            apply_date = datetime.strptime(applicant_detail_data['apply_date'], "%Y-%m-%d").date()
+                            applicant.apply_date = apply_date
+                        applicant.comments_count = applicant_detail_data['comments_count']                         
+                        applicant.source = applicant_detail_data['source']                         
+                        if applicant_detail_data['eeoc_veteran']:   
+                            applicant.eeoc_veteran = applicant_detail_data['eeoc_veteran']                         
+                        if applicant_detail_data['eeoc_disability']:   
+                            applicant.eeoc_disability = applicant_detail_data['eeoc_disability']                         
+                        if applicant_detail_data['eeoc_disability_signature']:   
+                            applicant.eeoc_disability_signature = applicant_detail_data['eeoc_disability_signature']                         
+                        if applicant_detail_data['eeoc_disability_date']:
+                            eeoc_disability_date = datetime.strptime(applicant_detail_data['eeoc_disability_date'], "%Y-%m-%d").date()
+                            applicant.eeoc_disability_date = eeoc_disability_date
+                        if "resume_link" in applicant_detail_data:                       
+                            applicant.resume_link = applicant_detail_data['resume_link']
+                        applicant.save()
+                        
+                        # Applicant Related Data
+                        applicant_manager = JobApplicantManager(applicant)
+                        
+                        # Delete existing comments for the applicant
+                        JobApplicantComment.objects.filter(applicant=applicant).delete()
+                        # Add new comments
+                        if 'comments' in applicant_detail_data and applicant_detail_data['comments']:
+                            if isinstance(applicant_detail_data['comments'], list):
+                                for comment in applicant_detail_data['comments']:
+                                    applicant_manager.create_job_applicant_comment(comment)
+                            else:
+                                comment = applicant_detail_data['comments']
+                                applicant_manager.create_job_applicant_feedback(comment)
+                        
+                        # Delete existing feedbacks for the applicant
+                        JobApplicantFeedback.objects.filter(applicant=applicant).delete()
+                        # Add new activities
+                        if 'feedbacks' in applicant_detail_data and applicant_detail_data['feedbacks']:
+                            if isinstance(applicant_detail_data['feedbacks'], list):
+                                for feedback in applicant_detail_data['feedbacks']:
+                                    applicant_manager.create_job_applicant_feedback(feedback)
+                            else:
+                                feedback = applicant_detail_data['feedbacks']
+                                applicant_manager.create_job_applicant_feedback(feedback)
+                        
+                        # Delete existing activities for the applicant
+                        JobApplicantActivity.objects.filter(applicant=applicant).delete()
+                        # Add new activities
+                        if 'activites' in applicant_detail_data and applicant_detail_data['activites']:
+                            if isinstance(applicant_detail_data['activites'], list):
+                                for activity in applicant_detail_data['activites']:
+                                    applicant_manager.create_applicant_activity(activity)
+                            else:
+                                activity = applicant_detail_data['messages']
+                                applicant_manager.create_applicant_activity(activity)
+
+                        
+                        # Delete existing messages for the applicant
+                        JobApplicantMessage.objects.filter(applicant=applicant).delete()
+                        # Add new messages
+                        if 'messages' in applicant_detail_data and applicant_detail_data['messages']:
+                            if isinstance(applicant_detail_data['messages'], list):
+                                for message in applicant_detail_data['messages']:
+                                    applicant_manager.create_job_applicant_message(message)
+                            else:
+                                message = applicant_detail_data['messages']
+                                applicant_manager.create_job_applicant_message(message)
+                        
+
+                        # Delete existing messages for the applicant
+                        JobApplicantAppliedJob.objects.filter(applicant=applicant).delete()
+                        # Add new messages
+                        if 'jobs' in applicant_detail_data and applicant_detail_data['jobs']:
+                            if isinstance(applicant_detail_data['jobs'], list):
+                                for job in applicant_detail_data['jobs']:
+                                    applicant_manager.create_applicant_applied_job(job)
+                            else:
+                                job = applicant_detail_data['jobs']
+                                applicant_manager.create_applicant_applied_job(job)
+
+            messages.success(request, f'Applicants sync successfully.')
+           
 
         change_list_url = reverse(
             'admin:%s_%s_changelist' % (
